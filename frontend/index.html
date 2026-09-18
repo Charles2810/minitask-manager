@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Task Manager</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --success: #16a34a;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 2.5rem 1rem;
+      margin: 0;
+    }
+    .container {
+      width: 100%;
+      max-width: 540px;
+      background: var(--surface);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      padding: 1.75rem;
+      border: 1px solid var(--border);
+    }
+    h1 { font-size: 1.5rem; margin-top: 0; margin-bottom: 1.25rem; }
+    form { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    input[type="text"]:focus { outline: 2px solid var(--primary); }
+    button {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 6px;
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .error-banner {
+      color: var(--danger);
+      font-size: 0.875rem;
+      min-height: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      gap: 0.75rem;
+    }
+    .task-title {
+      flex: 1;
+      cursor: pointer;
+      user-select: none;
+    }
+    .task-title.done {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+    .btn-delete {
+      background: transparent;
+      color: var(--danger);
+      padding: 0.4rem 0.6rem;
+      font-size: 0.875rem;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-delete:hover { background: #fee2e2; }
+  </style>
+</head>
+<body>
+  <main class="container" role="main">
+    <h1>Mini Task Manager</h1>
+    <!-- Formulario de creación de tarea -->
+    <form id="taskForm" aria-label="Crear nueva tarea">
+      <input
+        type="text"
+        id="taskInput"
+        placeholder="¿Qué tarea necesitas completar?"
+        aria-label="Título de la tarea"
+        aria-describedby="taskError"
+        required
+      />
+      <button type="submit">Agregar</button>
+    </form>
+
+    <!-- Mensaje de error con soporte de accesibilidad (screen readers) -->
+    <div id="taskError" class="error-banner" role="alert" aria-live="polite"></div>
+
+    <!-- Lista de tareas -->
+    <ul id="taskList" aria-label="Listado de tareas registradas"></ul>
+  </main>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api/tasks';
+    const form = document.getElementById('taskForm');
+    const input = document.getElementById('taskInput');
+    const errorDisplay = document.getElementById('taskError');
+    const taskList = document.getElementById('taskList');
+
+    function showError(message) {
+      errorDisplay.textContent = message;
+    }
+
+    function clearError() {
+      errorDisplay.textContent = '';
+    }
+
+    async function loadTasks() {
+      try {
+        const res = await fetch(API_URL);
+        const { data } = await res.json();
+        renderTasks(data);
+      } catch (err) {
+        showError('No se pudo conectar con el servidor.');
+      }
+    }
+
+    function renderTasks(tasks) {
+      taskList.innerHTML = '';
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+
+        const span = document.createElement('span');
+        span.className = `task-title ${task.status === 'done' ? 'done' : ''}`;
+        span.textContent = task.title;
+        span.title = 'Haz clic para alternar estado';
+        span.addEventListener('click', () => toggleTask(task.id));
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-delete';
+        btn.textContent = 'Eliminar';
+        btn.setAttribute('aria-label', `Eliminar tarea ${task.title}`);
+        btn.addEventListener('click', () => deleteTask(task.id));
+
+        li.appendChild(span);
+        li.appendChild(btn);
+        taskList.appendChild(li);
+      });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+      const title = input.value;
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title })
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          showError(result.error || 'Error al crear la tarea.');
+          return;
+        }
+
+        input.value = '';
+        loadTasks();
+      } catch (err) {
+        showError('Error de red al intentar guardar la tarea.');
+      }
+    });
+
+    async function toggleTask(id) {
+      clearError();
+      try {
+        const res = await fetch(`${API_URL}/${id}/toggle`, { method: 'PATCH' });
+        if (res.ok) loadTasks();
+      } catch (err) {
+        showError('No se pudo actualizar el estado.');
+      }
+    }
+
+    async function deleteTask(id) {
+      clearError();
+      try {
+        const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        if (res.ok) loadTasks();
+      } catch (err) {
+        showError('No se pudo eliminar la tarea.');
+      }
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
