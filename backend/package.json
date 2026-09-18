@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Backend API para Mini Task Manager",
+  "description": "Backend API para Mini Task Manager de Charles Conde",
   "main": "src/app.js",
   "scripts": {
     "dev": "nodemon src/app.js",
