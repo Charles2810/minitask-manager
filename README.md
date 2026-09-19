@@ -147,3 +147,13 @@ Se verificaron exitosamente todos los escenarios de prueba descritos en las pág
 - **Operaciones completas:** Inserción (`POST 201`), consulta cronológica (`GET 200`), alternancia de estado (`PATCH 200`) y eliminación física (`DELETE 200`).
 - **Accesibilidad y Frontend (Capa 1):** Interfaz web con atributos ARIA, navegación por teclado, anuncios para lectores de pantalla y consumo asíncrono con `fetch`.
 
+### 5. Toque Personal y Modernización UI/UX (Frontend Flat Minimalista)
+Se evolucionó la interfaz gráfica adoptando una estética **Flat Minimalista (inspirada en GitHub y Linear)**:
+- **Cero Gradientes:** Colores 100% planos y sobrios (`#f6f8fa` / `#ffffff` en modo claro y `#0d1117` / `#161b22` en modo oscuro), con bordes nítidos de 1px.
+- **Sistema de Temas (Dark / Light):** Soporte completo para Modo Oscuro y Modo Claro con detección automática de preferencia del sistema y persistencia en `localStorage`.
+- **Filtros Reactivos en Tiempo Real:** Pestañas estilo *pills* de GitHub para alternar entre **Todas**, **Pendientes** y **Completadas**, acompañadas de badges numéricos en vivo.
+- **Métricas y Barra de Progreso:** Track compacto de progreso que calcula el porcentaje de cumplimiento (`completadas / total * 100`) en tiempo real.
+- **Alertas Inline (GitHub Alert Style):** Banner plano de validación y confirmación que desaparece automáticamente sin interrumpir la interacción del usuario.
+- **Bootstrap Icons CDN Oficial (`v1.11.3`):** Iconografía vectorial limpia para acciones interactivas (`bi-circle`, `bi-check-circle-fill`, `bi-trash3`, `bi-moon`, `bi-sun`).
+
+

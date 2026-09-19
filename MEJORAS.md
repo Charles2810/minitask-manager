@@ -1,46 +1,46 @@
-# 🚀 Opciones de Mejora para Mini Task Manager
+# 🚀 Registro de Mejoras y Evolución: Mini Task Manager
 
-Documento de propuestas de evolución para el proyecto, estructurado por capas y clasificado por nivel de complejidad y prioridad para abordar en las próximas sesiones.
-
----
-
-## 📌 Resumen de Opciones Recomendadas para Mañana
-
-Si buscas dar un salto de calidad rápido en la presentación y funcionalidad del proyecto, las 3 mejoras más recomendadas son:
-1. **Edición del título de tareas (Full CRUD):** Completar el ciclo agregando la actualización de texto en Backend y Frontend.
-2. **Filtros por Estado y Buscador en tiempo real:** Todas / Pendientes / Completadas + contador visual.
-3. **Manejador Global de Errores en Express:** Limpieza de código en los controladores.
+Documento de seguimiento de mejoras implementadas y propuestas de evolución futura para el proyecto, estructurado por capas y clasificado por nivel de complejidad y prioridad.
 
 ---
 
-## 🎨 1. Mejoras en Frontend y Experiencia de Usuario (UI/UX)
+## ✅ Mejoras Implementadas (Fase 1: UI/UX Flat & Productividad)
 
-### Opción 1.1: Filtros de Estado y Contadores (Complejidad: Baja 🟢 | Impacto: Alto 🌟)
-- **Descripción:** Agregar una barra de pestañas para filtrar las tareas por: **"Todas"**, **"Pendientes"** y **"Completadas"**.
-- **Detalle:**
-  - Añadir contadores visuales (ej. *"3 pendientes, 2 completadas"*).
-  - Botón de acción rápida: *"Marcar todas como completadas"* o *"Limpiar completadas"*.
-- **Beneficio:** Aporta dinamismo inmediato a la vista sin requerir grandes cambios en el backend.
+En esta fase se transformó el frontend tradicional en una interfaz **Flat Minimalista (inspirada en GitHub y Linear)** con alta reactividad, accesibilidad y cero gradientes:
 
-### Opción 1.2: Edición en Línea del Título (Inline Editing) (Complejidad: Media 🟡 | Impacto: Alto 🌟)
+1. **Estética Flat Minimalista (GitHub / Linear):**
+   - Eliminación total de gradientes en favor de colores 100% planos y sobrios (`#f6f8fa` / `#ffffff` en claro, `#0d1117` / `#161b22` en oscuro).
+   - Bordes nítidos de 1px (`#d0d7de` y `#30363d`), tipografía moderna Inter y sombras sutiles.
+2. **Modo Oscuro / Modo Claro Persistente:**
+   - Detección automática de preferencia del sistema operativo (`prefers-color-scheme`).
+   - Interruptor con botón e icono plano (`bi-sun` / `bi-moon`) y guardado local en `localStorage`.
+3. **Filtros Reactivos y Contadores en Vivo:**
+   - Pestañas estilo *pills* de GitHub para alternar entre **Todas**, **Pendientes** y **Completadas**.
+   - Badges numéricos planos que se recalculan en tiempo real sin recargar la página.
+4. **Métricas y Barra de Progreso Compacta:**
+   - Track de progreso plano de 6px que muestra el porcentaje completado y la relación `X de Y`.
+5. **Alertas Inline (GitHub Alert Style):**
+   - Banner plano accesible integrado directamente en la tarjeta con auto-cierre y botón manual (verde para éxito, rojo para errores de validación, azul para información).
+6. **Integración con Bootstrap Icons CDN Oficial (`v1.11.3`):**
+   - Iconografía de línea nítida para todas las acciones interactivas (`bi-check2-square`, `bi-circle`, `bi-check-circle-fill`, `bi-trash3`).
+
+---
+
+## 🎨 1. Próximas Mejoras en Frontend y Experiencia de Usuario (UI/UX)
+
+### Opción 1.1: Edición en Línea del Título (Inline Editing) (Complejidad: Media 🟡 | Impacto: Alto 🌟)
 - **Descripción:** Permitir hacer doble clic sobre el texto de una tarea (o presionar un botón de lápiz ✏️) para transformar el texto en un `<input>` editable y presionar `Enter` o `Escape`.
-- **Beneficio:** Convierte la aplicación en un CRUD interactivo completo y moderno.
+- **Beneficio:** Convierte la aplicación en un CRUD interactivo completo y moderno sin recargar.
 
-### Opción 1.3: Modo Oscuro (Dark Mode) y Diseño Glassmorphism (Complejidad: Baja 🟢 | Impacto: Medio ⭐)
-- **Descripción:** Agregar un interruptor de tema (Sol ☀️ / Luna 🌙) con persistencia en `localStorage`.
-- **Detalle:**
-  - Variables CSS dinámicas para modo oscuro (`--bg: #0f172a`, `--surface: #1e293b`, etc.).
-  - Micro-animaciones al agregar o eliminar elementos (fade-in, slide-out).
-
-### Opción 1.4: Notificaciones Toast y Confirmaciones Accesibles (Complejidad: Baja 🟢 | Impacto: Medio ⭐)
-- **Descripción:** Reemplazar las alertas de error estáticas por banners tipo *Toast* flotantes temporizados (desaparecen tras 3-4 segundos con barra de progreso).
-- **Detalle:** Modal o confirmación accesible antes de eliminar una tarea importante.
+### Opción 1.2: Buscador en Tiempo Real (Complejidad: Baja 🟢 | Impacto: Medio ⭐)
+- **Descripción:** Añadir un campo de búsqueda rápida con icono `bi-search` para filtrar tareas por texto al instante mientras el usuario escribe.
+- **Beneficio:** Localización ágil de tareas cuando el listado crece.
 
 ---
 
 ## ⚙️ 2. Mejoras en Backend y Arquitectura (API & Capas)
 
-### Opción 2.1: Endpoint de Actualización de Título (`PUT` o `PATCH /api/tasks/:id`) (Complejidad: Baja 🟢 | Impacto: Alto 🌟)
+### Opción 2.1: Endpoint de Actualización de Título (`PUT /api/tasks/:id`) (Complejidad: Baja 🟢 | Impacto: Alto 🌟)
 - **Descripción:** Actualmente la API solo permite modificar el estado (`/toggle`), pero no corregir o editar el texto del título.
 - **Implementación por capas:**
   1. **Repository:** Método `updateTitle(id, title)`.
@@ -73,7 +73,7 @@ Si buscas dar un salto de calidad rápido en la presentación y funcionalidad de
 - **Descripción:** Extender la tabla `tasks` con:
   - `priority VARCHAR(10) DEFAULT 'media' CHECK (priority IN ('baja', 'media', 'alta'))`
   - `due_date DATE NULL`
-- **Beneficio:** Permite ordenar las tareas por urgencia y pintar badges de colores (Rojo = Alta, Amarillo = Media, Verde = Baja).
+- **Beneficio:** Permite ordenar las tareas por urgencia y pintar badges de colores planos (Alta, Media, Baja).
 
 ### Opción 3.3: Creación de Índices de Rendimiento (Complejidad: Muy Baja 🟢 | Impacto: Medio ⭐)
 - **Descripción:** Agregar índices en `status` y `created_at` para optimizar consultas a gran escala:
@@ -84,7 +84,7 @@ Si buscas dar un salto de calidad rápido en la presentación y funcionalidad de
 
 ---
 
-## 🧪 4. Automatización, Pruebas y Calidad de Código
+## 🧪 4. Automatización, Pruebas y Despliegue
 
 ### Opción 4.1: Suite de Tests Automatizados con Jest y Supertest (Complejidad: Media 🟡 | Impacto: Muy Alto 🏆)
 - **Descripción:** Crear pruebas automatizadas que corran con `npm test`:
@@ -97,10 +97,5 @@ Si buscas dar un salto de calidad rápido en la presentación y funcionalidad de
 
 ---
 
-## 🗓️ Hoja de Ruta Sugerida para Mañana
-
-Si dispones de **1 a 2 horas**, el plan más productivo es:
-
-1. **Paso 1 (Backend):** Implementar la actualización de títulos (`PUT /api/tasks/:id`) a través de las capas Repository -> Service -> Controller.
-2. **Paso 2 (Frontend):** Añadir soporte para editar tarea (doble clic o botón editar) y botones de filtro: *"Todas"*, *"Pendientes"*, *"Completadas"*.
-3. **Paso 3 (Estilos & UX):** Añadir el interruptor de Modo Oscuro y badges de estado visuales.
+## 🗓️ Próximo Paso Sugerido
+Completar el ciclo **Full CRUD** añadiendo la actualización de título (`PUT /api/tasks/:id`) a través de las 5 capas arquitectónicas (Repository &rarr; Service &rarr; Controller &rarr; Frontend con doble clic o botón de editar).

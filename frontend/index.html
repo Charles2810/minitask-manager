@@ -1,168 +1,787 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini Task Manager</title>
+  <title>Mini Task Manager | Gestor de Tareas</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
   <style>
     :root {
-      --primary: #2563eb;
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --danger: #ef4444;
-      --success: #16a34a;
+      --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      
+      /* Modo Claro (GitHub / Linear Flat) - Cero Gradientes */
+      --bg-page: #f6f8fa;
+      --bg-surface: #ffffff;
+      --bg-hover: #f3f4f6;
+      --bg-active: #e5e7eb;
+      --border-color: #d0d7de;
+      --border-muted: #e5e7eb;
+
+      --text-main: #1f2328;
+      --text-muted: #656d76;
+      --text-placeholder: #8c959f;
+
+      /* Acento Azul GitHub/Linear Plano */
+      --accent: #0969da;
+      --accent-hover: #0858b9;
+      --accent-subtle: #ddf4ff;
+      --accent-border: #54aeff;
+      --accent-text: #0969da;
+
+      /* Estados Planos */
+      --success: #1a7f37;
+      --success-bg: #dafbe1;
+      --success-border: #4ac26b;
+
+      --danger: #cf222e;
+      --danger-bg: #ffebe9;
+      --danger-border: #ff8182;
+      --danger-hover: #a40e26;
+
+      --shadow-subtle: 0 1px 3px rgba(31, 35, 40, 0.08);
+      --radius: 6px;
+      --radius-pill: 20px;
     }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      padding: 2.5rem 1rem;
+
+    [data-theme="dark"] {
+      /* Modo Oscuro (GitHub Dark / Linear Dark) - Cero Gradientes */
+      --bg-page: #0d1117;
+      --bg-surface: #161b22;
+      --bg-hover: #21262d;
+      --bg-active: #30363d;
+      --border-color: #30363d;
+      --border-muted: #21262d;
+
+      --text-main: #e6edf3;
+      --text-muted: #848d97;
+      --text-placeholder: #6e7681;
+
+      --accent: #2f81f7;
+      --accent-hover: #388bfd;
+      --accent-subtle: #0c2d6b;
+      --accent-border: #1f6feb;
+      --accent-text: #2f81f7;
+
+      --success: #3fb950;
+      --success-bg: #112c1c;
+      --success-border: #238636;
+
+      --danger: #f85149;
+      --danger-bg: #3c1e21;
+      --danger-border: #da3633;
+      --danger-hover: #ff7b72;
+
+      --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
     }
-    .container {
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem 4rem;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Contenedor Principal Plano */
+    .app-card {
       width: 100%;
-      max-width: 540px;
-      background: var(--surface);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      padding: 1.75rem;
-      border: 1px solid var(--border);
+      max-width: 560px;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-subtle);
+      padding: 1.5rem;
     }
-    h1 { font-size: 1.5rem; margin-top: 0; margin-bottom: 1.25rem; }
-    form { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
-    input[type="text"] {
-      flex: 1;
-      padding: 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    input[type="text"]:focus { outline: 2px solid var(--primary); }
-    button {
-      padding: 0.75rem 1.25rem;
-      border: none;
-      border-radius: 6px;
-      background: var(--primary);
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .error-banner {
-      color: var(--danger);
-      font-size: 0.875rem;
-      min-height: 1.25rem;
-      margin-bottom: 1rem;
-    }
-    ul { list-style: none; padding: 0; margin: 0; }
-    li {
+
+    /* Encabezado */
+    .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.75rem;
-      border-bottom: 1px solid var(--border);
-      gap: 0.75rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-muted);
+      margin-bottom: 1.25rem;
     }
-    .task-title {
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .header-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background-color: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-pill);
+    }
+
+    /* Botón Selector de Tema */
+    .btn-theme {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-theme:hover {
+      background-color: var(--bg-hover);
+      border-color: var(--text-muted);
+    }
+
+    /* Barra de Progreso Compacta y Plana */
+    .progress-box {
+      margin-bottom: 1.25rem;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .progress-count {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .progress-track {
+      height: 6px;
+      background-color: var(--bg-hover);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background-color: var(--accent);
+      border-radius: var(--radius-pill);
+      transition: width 0.3s ease;
+    }
+
+    /* Formulario de Entrada */
+    form {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .input-field {
+      flex: 1;
+      padding: 0.55rem 0.8rem;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-subtle);
+    }
+
+    .input-field::placeholder {
+      color: var(--text-placeholder);
+    }
+
+    .btn-add {
+      background-color: var(--accent);
+      color: #ffffff;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 0.55rem 1rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background-color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-add:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-add:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Banner Inline Plano estilo GitHub Alert */
+    .alert-banner {
+      display: none;
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid transparent;
+    }
+
+    .alert-banner.active {
+      display: flex;
+    }
+
+    .alert-banner.error {
+      background-color: var(--danger-bg);
+      border-color: var(--danger-border);
+      color: var(--danger);
+    }
+
+    .alert-banner.success {
+      background-color: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success);
+    }
+
+    .alert-banner.info {
+      background-color: var(--accent-subtle);
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+    }
+
+    .alert-content {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .alert-close {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      opacity: 0.7;
+    }
+
+    .alert-close:hover {
+      opacity: 1;
+    }
+
+    /* Pestañas de Filtro Planas (GitHub Pills) */
+    .filter-tabs {
+      display: flex;
+      gap: 0.4rem;
+      padding-bottom: 0.85rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-muted);
+    }
+
+    .filter-tab {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .filter-tab:hover {
+      background-color: var(--bg-hover);
+      color: var(--text-main);
+    }
+
+    .filter-tab.active {
+      background-color: var(--bg-hover);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    .filter-counter {
+      font-size: 0.72rem;
+      font-weight: 600;
+      background-color: var(--bg-active);
+      color: var(--text-main);
+      padding: 0.1rem 0.4rem;
+      border-radius: var(--radius-pill);
+    }
+
+    /* Lista de Tareas */
+    .task-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 0.5rem;
+      border-bottom: 1px solid var(--border-muted);
+      gap: 0.75rem;
+      transition: background-color 0.15s ease;
+      border-radius: var(--radius);
+    }
+
+    .task-item:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .task-item-main {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
       flex: 1;
       cursor: pointer;
-      user-select: none;
+      min-width: 0;
     }
-    .task-title.done {
+
+    /* Checkbox Circular Plano */
+    .check-btn {
+      font-size: 1.15rem;
+      color: var(--text-placeholder);
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+    }
+
+    .task-item:hover .check-btn {
+      color: var(--accent);
+    }
+
+    .task-item.is-done .check-btn {
+      color: var(--success);
+    }
+
+    .task-title {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      word-break: break-word;
+      user-select: none;
+      transition: color 0.15s ease;
+    }
+
+    .task-item.is-done .task-title {
       text-decoration: line-through;
       color: var(--text-muted);
     }
+
+    /* Botón Eliminar Sutil */
     .btn-delete {
-      background: transparent;
-      color: var(--danger);
-      padding: 0.4rem 0.6rem;
-      font-size: 0.875rem;
+      background: none;
       border: 1px solid transparent;
-      border-radius: 4px;
+      color: var(--text-muted);
+      border-radius: var(--radius);
+      padding: 0.3rem 0.45rem;
+      font-size: 0.85rem;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      opacity: 0.7;
+      transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
     }
-    .btn-delete:hover { background: #fee2e2; }
+
+    .task-item:hover .btn-delete {
+      opacity: 1;
+    }
+
+    .btn-delete:hover {
+      background-color: var(--danger-bg);
+      color: var(--danger);
+      border-color: var(--danger-border);
+    }
+
+    /* Estado Vacío Plano */
+    .empty-box {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      font-size: 2rem;
+      color: var(--text-placeholder);
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-box h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .empty-box p {
+      font-size: 0.84rem;
+    }
+
+
   </style>
 </head>
 <body>
-  <main class="container" role="main">
-    <h1>Mini Task Manager</h1>
-    <!-- Formulario de creación de tarea -->
+
+  <main class="app-card" role="main">
+    <!-- Encabezado -->
+    <header class="header">
+      <div class="header-info">
+        <h1 class="header-title">
+          <i class="bi bi-check2-square" style="color: var(--accent);"></i>
+          Mini Task Manager
+        </h1>
+        <span class="header-badge">5 Capas</span>
+      </div>
+
+      <!-- Botón de Modo Oscuro / Claro -->
+      <button id="themeToggle" class="btn-theme" aria-label="Cambiar modo oscuro o claro" title="Cambiar tema">
+        <i class="bi bi-moon" id="themeIcon"></i>
+      </button>
+    </header>
+
+    <!-- Barra de Progreso Compacta -->
+    <section class="progress-box" aria-label="Métricas de cumplimiento">
+      <div class="progress-labels">
+        <span>Progreso general</span>
+        <span id="progressText" class="progress-count">0 de 0 (0%)</span>
+      </div>
+      <div class="progress-track">
+        <div id="progressBar" class="progress-fill" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </section>
+
+    <!-- Formulario de Creación de Tarea -->
     <form id="taskForm" aria-label="Crear nueva tarea">
       <input
         type="text"
         id="taskInput"
-        placeholder="¿Qué tarea necesitas completar?"
+        class="input-field"
+        placeholder="Escribe una nueva tarea..."
         aria-label="Título de la tarea"
         aria-describedby="taskError"
+        autocomplete="off"
         required
       />
-      <button type="submit">Agregar</button>
+      <button type="submit" id="btnSubmit" class="btn-add">
+        <i class="bi bi-plus-lg"></i>
+        <span>Agregar</span>
+      </button>
     </form>
 
-    <!-- Mensaje de error con soporte de accesibilidad (screen readers) -->
-    <div id="taskError" class="error-banner" role="alert" aria-live="polite"></div>
+    <!-- Banner Inline de Alerta (GitHub Alert Style) -->
+    <div id="taskError" class="alert-banner" role="alert" aria-live="polite">
+      <div class="alert-content">
+        <i class="bi bi-info-circle" id="alertIcon"></i>
+        <span id="alertMessage"></span>
+      </div>
+      <button type="button" class="alert-close" id="alertClose" aria-label="Cerrar alerta">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
 
-    <!-- Lista de tareas -->
-    <ul id="taskList" aria-label="Listado de tareas registradas"></ul>
+    <!-- Pestañas de Filtro Planas -->
+    <nav class="filter-tabs" aria-label="Filtros de estado">
+      <button type="button" class="filter-tab active" data-filter="all" id="filterAll">
+        <span>Todas</span>
+        <span class="filter-counter" id="countAll">0</span>
+      </button>
+      <button type="button" class="filter-tab" data-filter="pending" id="filterPending">
+        <span>Pendientes</span>
+        <span class="filter-counter" id="countPending">0</span>
+      </button>
+      <button type="button" class="filter-tab" data-filter="done" id="filterDone">
+        <span>Completadas</span>
+        <span class="filter-counter" id="countDone">0</span>
+      </button>
+    </nav>
+
+    <!-- Lista de Tareas -->
+    <ul id="taskList" class="task-list" aria-label="Listado de tareas"></ul>
+
+    <!-- Estado Vacío -->
+    <div id="emptyState" class="empty-box">
+      <div class="empty-icon">
+        <i class="bi bi-inbox"></i>
+      </div>
+      <h3 id="emptyTitle">No hay tareas en esta vista</h3>
+      <p id="emptySubtitle">Escribe una tarea arriba para agregarla a tu lista.</p>
+    </div>
+
+
   </main>
 
   <script>
+    // Configuración API
     const API_URL = 'http://localhost:3000/api/tasks';
+
+    // Elementos del DOM
     const form = document.getElementById('taskForm');
     const input = document.getElementById('taskInput');
-    const errorDisplay = document.getElementById('taskError');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const alertBanner = document.getElementById('taskError');
+    const alertIcon = document.getElementById('alertIcon');
+    const alertMessage = document.getElementById('alertMessage');
+    const alertClose = document.getElementById('alertClose');
     const taskList = document.getElementById('taskList');
+    const emptyState = document.getElementById('emptyState');
+    const emptyTitle = document.getElementById('emptyTitle');
+    const emptySubtitle = document.getElementById('emptySubtitle');
 
-    function showError(message) {
-      errorDisplay.textContent = message;
+    // Métricas y Progreso
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const countAll = document.getElementById('countAll');
+    const countPending = document.getElementById('countPending');
+    const countDone = document.getElementById('countDone');
+
+    // Filtros
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    let currentFilter = 'all';
+
+    // Estado Local de Tareas
+    let tasksState = [];
+
+    // Sistema de Tema (Dark / Light)
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const htmlElement = document.documentElement;
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('minitask_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      setTheme(savedTheme);
+    }
+
+    function setTheme(theme) {
+      htmlElement.setAttribute('data-theme', theme);
+      localStorage.setItem('minitask_theme', theme);
+
+      if (theme === 'dark') {
+        themeIcon.className = 'bi bi-sun';
+        themeToggle.title = 'Cambiar a modo claro';
+      } else {
+        themeIcon.className = 'bi bi-moon';
+        themeToggle.title = 'Cambiar a modo oscuro';
+      }
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const activeTheme = htmlElement.getAttribute('data-theme');
+      setTheme(activeTheme === 'dark' ? 'light' : 'dark');
+    });
+
+    // Manejo de Alertas Inline (GitHub Alert Style)
+    let alertTimeout = null;
+
+    function showAlert(message, type = 'info') {
+      clearTimeout(alertTimeout);
+
+      alertBanner.className = `alert-banner active ${type}`;
+      alertMessage.textContent = message;
+
+      if (type === 'error') {
+        alertIcon.className = 'bi bi-exclamation-octagon';
+      } else if (type === 'success') {
+        alertIcon.className = 'bi bi-check-circle';
+      } else {
+        alertIcon.className = 'bi bi-info-circle';
+      }
+
+      alertTimeout = setTimeout(() => {
+        clearAlert();
+      }, 4000);
+    }
+
+    function clearAlert() {
+      alertBanner.className = 'alert-banner';
+      alertMessage.textContent = '';
+      clearTimeout(alertTimeout);
+    }
+
+    alertClose.addEventListener('click', clearAlert);
+
+    // Compatibilidad con funciones originales
+    function showError(msg) {
+      showAlert(msg, 'error');
     }
 
     function clearError() {
-      errorDisplay.textContent = '';
+      clearAlert();
     }
 
+    // Actualización de Métricas y Contadores
+    function updateMetrics(tasks) {
+      const total = tasks.length;
+      const doneCount = tasks.filter(t => t.status === 'done').length;
+      const pendingCount = total - doneCount;
+
+      countAll.textContent = total;
+      countPending.textContent = pendingCount;
+      countDone.textContent = doneCount;
+
+      const percentage = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+      progressBar.style.width = `${percentage}%`;
+      progressBar.setAttribute('aria-valuenow', percentage);
+      progressText.textContent = `${doneCount} de ${total} (${percentage}%)`;
+    }
+
+    // Cargar Tareas desde la API
     async function loadTasks() {
       try {
         const res = await fetch(API_URL);
         const { data } = await res.json();
-        renderTasks(data);
+        tasksState = data || [];
+        updateMetrics(tasksState);
+        renderTasks();
       } catch (err) {
         showError('No se pudo conectar con el servidor.');
       }
     }
 
-    function renderTasks(tasks) {
+    // Renderizar Tareas según Filtro
+    function renderTasks() {
       taskList.innerHTML = '';
-      tasks.forEach(task => {
-        const li = document.createElement('li');
 
-        const span = document.createElement('span');
-        span.className = `task-title ${task.status === 'done' ? 'done' : ''}`;
-        span.textContent = task.title;
-        span.title = 'Haz clic para alternar estado';
-        span.addEventListener('click', () => toggleTask(task.id));
-
-        const btn = document.createElement('button');
-        btn.className = 'btn-delete';
-        btn.textContent = 'Eliminar';
-        btn.setAttribute('aria-label', `Eliminar tarea ${task.title}`);
-        btn.addEventListener('click', () => deleteTask(task.id));
-
-        li.appendChild(span);
-        li.appendChild(btn);
-        taskList.appendChild(li);
+      const filteredTasks = tasksState.filter(task => {
+        if (currentFilter === 'pending') return task.status === 'pending';
+        if (currentFilter === 'done') return task.status === 'done';
+        return true;
       });
+
+      if (filteredTasks.length === 0) {
+        emptyState.style.display = 'block';
+        if (currentFilter === 'pending') {
+          emptyTitle.textContent = '¡Sin tareas pendientes!';
+          emptySubtitle.textContent = 'Has terminado todas tus tareas pendientes.';
+        } else if (currentFilter === 'done') {
+          emptyTitle.textContent = 'Sin tareas completadas';
+          emptySubtitle.textContent = 'Marca una tarea haciendo clic en su casilla.';
+        } else {
+          emptyTitle.textContent = 'No hay tareas';
+          emptySubtitle.textContent = 'Escribe tu primera tarea arriba para comenzar.';
+        }
+      } else {
+        emptyState.style.display = 'none';
+
+        filteredTasks.forEach(task => {
+          const li = document.createElement('li');
+          const isDone = task.status === 'done';
+          li.className = `task-item ${isDone ? 'is-done' : ''}`;
+
+          // Contenedor principal de la tarea
+          const mainDiv = document.createElement('div');
+          mainDiv.className = 'task-item-main';
+          mainDiv.title = 'Haz clic para alternar estado';
+          mainDiv.addEventListener('click', () => toggleTask(task.id, isDone));
+
+          // Checkbox circular
+          const checkSpan = document.createElement('span');
+          checkSpan.className = 'check-btn';
+          checkSpan.innerHTML = `<i class="bi ${isDone ? 'bi-check-circle-fill' : 'bi-circle'}"></i>`;
+          mainDiv.appendChild(checkSpan);
+
+          // Título de la tarea
+          const spanTitle = document.createElement('span');
+          spanTitle.className = 'task-title';
+          spanTitle.textContent = task.title;
+          mainDiv.appendChild(spanTitle);
+
+          // Botón Eliminar sutil
+          const btnDelete = document.createElement('button');
+          btnDelete.className = 'btn-delete';
+          btnDelete.innerHTML = '<i class="bi bi-trash3"></i>';
+          btnDelete.setAttribute('aria-label', `Eliminar tarea ${task.title}`);
+          btnDelete.title = 'Eliminar tarea';
+          btnDelete.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteTask(task.id);
+          });
+
+          li.appendChild(mainDiv);
+          li.appendChild(btnDelete);
+          taskList.appendChild(li);
+        });
+      }
     }
 
+    // Cambio de Filtro
+    filterTabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterTabs.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderTasks();
+      });
+    });
+
+    // Envío del Formulario (Crear Tarea)
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      clearError();
-      const title = input.value;
+      clearAlert();
+      const title = input.value.trim();
+
+      if (!title) return;
+
+      btnSubmit.disabled = true;
 
       try {
         const res = await fetch(API_URL, {
@@ -179,32 +798,50 @@
         }
 
         input.value = '';
-        loadTasks();
+        showAlert('Tarea creada correctamente.', 'success');
+        await loadTasks();
       } catch (err) {
         showError('Error de red al intentar guardar la tarea.');
+      } finally {
+        btnSubmit.disabled = false;
+        input.focus();
       }
     });
 
-    async function toggleTask(id) {
-      clearError();
+    // Alternar Estado (Toggle)
+    async function toggleTask(id, wasDone) {
+      clearAlert();
       try {
         const res = await fetch(`${API_URL}/${id}/toggle`, { method: 'PATCH' });
-        if (res.ok) loadTasks();
+        if (res.ok) {
+          showAlert(wasDone ? 'Tarea marcada como pendiente.' : 'Tarea completada.', 'info');
+          loadTasks();
+        } else {
+          showError('No se pudo actualizar el estado.');
+        }
       } catch (err) {
-        showError('No se pudo actualizar el estado.');
+        showError('Error de conexión al actualizar tarea.');
       }
     }
 
+    // Eliminar Tarea
     async function deleteTask(id) {
-      clearError();
+      clearAlert();
       try {
         const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-        if (res.ok) loadTasks();
+        if (res.ok) {
+          showAlert('Tarea eliminada correctamente.', 'success');
+          loadTasks();
+        } else {
+          showError('No se pudo eliminar la tarea.');
+        }
       } catch (err) {
-        showError('No se pudo eliminar la tarea.');
+        showError('Error de conexión al eliminar tarea.');
       }
     }
 
+    // Inicialización
+    initTheme();
     loadTasks();
   </script>
 </body>
